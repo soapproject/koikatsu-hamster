@@ -2,7 +2,7 @@
 
 ## Motivation
 
-If you are as passionate about collecting cards as a man of culture, you might download hundreds of cards in a single day, and you'll need a program capable of categorizing them in bulk. Although kkManager can solve this problem quite well, it relies on a GUI and has a relatively comprehensive set of features (which you might not need all of). This project, on the other hand, focuses solely on categorization.
+If you are as passionate about collecting cards as a man of culture, you might download hundreds of cards in a single day, and you'll need a program capable of categorizing them in bulk. Although KKManager can solve this problem quite well, it relies on a GUI and has a relatively comprehensive set of features (which you might not need all of). This project, on the other hand, focuses solely on categorization.
 
 ## Credit
 
