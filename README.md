@@ -26,11 +26,11 @@ dotnet restore
 ### Simple build command
 
 ```
-dotnet build
+dotnet build koikatsu-hamster.sln
 ```
 
 ### Build to single exe file
 
 ```
-dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o out
+dotnet publish koikatsu-hamster.sln -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o out
 ```
