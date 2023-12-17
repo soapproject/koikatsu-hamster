@@ -103,69 +103,77 @@ namespace IllCardFilter
 
         private static bool ProcessCardData(Stream stream, FileInfo file)
         {
-            using (var reader = new BinaryReader(stream)){
-                // 4 bytes before game type,
-                // it may looks like NUL NUL NUL DC4 if you open png with Nodepad++.
-                int loadProductNo = reader.ReadInt32();
-                if (loadProductNo > 100)
-                {
-                    // TODO I found some GameType like 【KStudio】 is not in first IDEN, so we need a new method in that case. But let's just skip it so far.
-                    return false;
-                }
-
-                string marker = reader.ReadString();
-                var (gameType, cardType) = GetGameAndCardType(marker);
-
-                // Skip unknow GameType
-                if(gameType == GameType.Unknown) return false;
-
-                string gameTypeFolderName = gameType switch
-                {
-                    GameType.KoikatsuParty => GameType.Koikatu.ToString(),
-                    GameType.KoikatsuPartySpecialPatch => GameType.Koikatu.ToString(),
-                    GameType.HoneyComeccp => GameType.HoneyCome.ToString(),
-                    _ => gameType.ToString(),
-                };
-                var gameTypeFolder = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), gameTypeFolderName));
-                var cardTypeFolder = Directory.CreateDirectory(Path.Combine(gameTypeFolder.FullName, cardType.ToString()));
-                string sexFolderName = "";
-                if(cardType == CardType.Chara)
-                {
-                    // Read data until the read pointer is at position of blockHeader
-                    var loadVersion = reader.ReadString();
-                    var faceLength = reader.ReadInt32();
-                    if (faceLength > 0)
-                    {
-                        reader.BaseStream.Seek(faceLength, SeekOrigin.Current);
-                    }
-                    var count = reader.ReadInt32();
-                    var bytes = reader.ReadBytes(count);
-                    var blockHeader = MessagePackSerializer.Deserialize<BlockHeader>(bytes);
-                    var num2 = reader.ReadInt64();
-                    var position = reader.BaseStream.Position;
-                    var info = blockHeader.SearchInfo("Parameter") ?? throw new InvalidOperationException("Info object not found.");;
-                    reader.BaseStream.Seek(position + info.pos, SeekOrigin.Begin);
-                    byte[] parameterBytes = reader.ReadBytes((int)info.size);
-                    CharaParameter parameter = MessagePackSerializer.Deserialize<CharaParameter>(parameterBytes);
-                    sexFolderName = parameter.sex switch
-                    {
-                        0 => "Male",
-                        1 => "Female",
-                        _ => "Unknown"
-                    };
-                    var sexFolder = Directory.CreateDirectory(Path.Combine(cardTypeFolder.FullName, sexFolderName));
-                }
-
-                var destinationPath = Path.Combine(cardTypeFolder.FullName, sexFolderName, file.Name);
-                destinationPath = RenameIfFileExist(destinationPath);
-
-                reader.Close();
-                stream.Close();
-                file.MoveTo(destinationPath);
-                Console.WriteLine($"Moved file={file.Name} to {destinationPath}");
-
-                return true;
+            using var reader = new BinaryReader(stream);
+            // 4 bytes before game type,
+            // it may looks like NUL NUL NUL DC4 if you open png with Nodepad++.
+            int loadProductNo = reader.ReadInt32();
+            if (loadProductNo > 100)
+            {
+                // TODO I found some GameType like 【KStudio】 is not in first IDEN, so we need a new method in that case. But let's just skip it so far.
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Warning: loadProductNo > 100");
+                Console.ResetColor();
+                // return false;
             }
+
+            string marker = reader.ReadString();
+            var (gameType, cardType) = GetGameAndCardType(marker);
+
+            // Skip unknow GameType
+            if (gameType == GameType.Unknown)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"GameType Unknown");
+                Console.ResetColor();
+                return false;
+            };
+
+            string gameTypeFolderName = gameType switch
+            {
+                GameType.KoikatsuParty => GameType.Koikatu.ToString(),
+                GameType.KoikatsuPartySpecialPatch => GameType.Koikatu.ToString(),
+                GameType.HoneyComeccp => GameType.HoneyCome.ToString(),
+                _ => gameType.ToString(),
+            };
+            var gameTypeFolder = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), gameTypeFolderName));
+            var cardTypeFolder = Directory.CreateDirectory(Path.Combine(gameTypeFolder.FullName, cardType.ToString()));
+            string sexFolderName = "";
+            if (cardType == CardType.Chara)
+            {
+                // Read data until the read pointer is at position of blockHeader
+                var loadVersion = reader.ReadString();
+                var faceLength = reader.ReadInt32();
+                if (faceLength > 0)
+                {
+                    reader.BaseStream.Seek(faceLength, SeekOrigin.Current);
+                }
+                var count = reader.ReadInt32();
+                var bytes = reader.ReadBytes(count);
+                var blockHeader = MessagePackSerializer.Deserialize<BlockHeader>(bytes);
+                var num2 = reader.ReadInt64();
+                var position = reader.BaseStream.Position;
+                var info = blockHeader.SearchInfo("Parameter") ?? throw new InvalidOperationException("Info object not found."); ;
+                reader.BaseStream.Seek(position + info.pos, SeekOrigin.Begin);
+                byte[] parameterBytes = reader.ReadBytes((int)info.size);
+                CharaParameter parameter = MessagePackSerializer.Deserialize<CharaParameter>(parameterBytes);
+                sexFolderName = parameter.sex switch
+                {
+                    0 => "Male",
+                    1 => "Female",
+                    _ => "Unknown"
+                };
+                var sexFolder = Directory.CreateDirectory(Path.Combine(cardTypeFolder.FullName, sexFolderName));
+            }
+
+            var destinationPath = Path.Combine(cardTypeFolder.FullName, sexFolderName, file.Name);
+            destinationPath = RenameIfFileExist(destinationPath);
+
+            reader.Close();
+            stream.Close();
+            file.MoveTo(destinationPath);
+            Console.WriteLine($"Moved file={file.Name} to {destinationPath}");
+
+            return true;
         }
 
         private static bool ParseCard(FileInfo file)
