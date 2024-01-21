@@ -1,65 +1,51 @@
-using MessagePack;
+using System;
+using System.IO;
 
 namespace IllCardFilter
 {
-    public class PngChunkFinder {
-        // PngChunks are defined here, https://www.w3.org/TR/png-3/#3PNGsignature
-        // We don't need to find PngStartChunk for this card filter, but I want to leave a reference.
-        // private static readonly byte[] PngStartChunk = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-        // 0x89, 0x50, 0x4E, 0x47 is IEND.
-        // 0xAE 0x42 0x60 0x82 is the CRC check.
+    public class PngChunkFinder
+    {
         private static readonly byte[] PngEndChunk = { 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82 };
 
-        // Find position of EndChunk "in the buffer", it should not greater then the buffer size.
-        private static int SearchEndChunkIndex(byte[] buffer, int readLength)
+        private static int IndexOf(byte[] buffer, byte[] pattern)
         {
-            var firstByteOfEndChunk = PngEndChunk[0];
-            for (var bufferIndex = 0; bufferIndex < readLength; bufferIndex++)
+            for (int i = 0; i <= buffer.Length - pattern.Length; i++)
             {
-                if (buffer[bufferIndex] != firstByteOfEndChunk) continue;
-
-                var isMatch = false;
-                for (var chunkIndex = 1; chunkIndex < PngEndChunk.Length && bufferIndex + chunkIndex < readLength; chunkIndex++)
+                bool found = true;
+                for (int j = 0; j < pattern.Length; j++)
                 {
-                    var byteIsNotInEndChunk = buffer[bufferIndex + chunkIndex] != PngEndChunk[chunkIndex];
-                    if (byteIsNotInEndChunk) break;
-                    if (chunkIndex == PngEndChunk.Length - 1)
+                    if (buffer[i + j] != pattern[j])
                     {
-                        isMatch = true;
+                        found = false;
+                        break;
                     }
                 }
-
-                var notOverFlow = bufferIndex + PngEndChunk.Length <= readLength;
-                if (isMatch && notOverFlow)
+                if (found)
                 {
-                    return bufferIndex;
+                    return i;
                 }
             }
             return -1;
         }
 
-        // Attempting to read the stream in chunks of bufferSize each time until the position of the endChunk is found,
-        // and then return the position of last byte in endChunk.
-        private static long SearchEndChunkLastBytePosition(Stream stream)
+        public static long SearchPngEnd(Stream stream)
         {
-            const int bufferSize = 4096;
-            byte[] buffer = new byte[bufferSize];
-            var origPos = stream.Position;
-            int readLength;
-            while ((readLength = stream.Read(buffer, 0, buffer.Length)) > 0)
+            if (stream == null || !stream.CanRead)
             {
-                var endChunkIndex = SearchEndChunkIndex(buffer, readLength);
-                if (endChunkIndex < 0) continue;
-                var endChunkFirstBytePosition = (stream.Position - readLength) + endChunkIndex;
-                var endChunkLastBytePosition = endChunkFirstBytePosition + PngEndChunk.Length;
-                return endChunkLastBytePosition;
+                throw new ArgumentException("Stream is null or cannot be read.");
             }
-            stream.Position = origPos;
-            return -1;
+
+            stream.Seek(0, SeekOrigin.Begin);
+            var buffer = new byte[stream.Length];
+            stream.Read(buffer, 0, buffer.Length);
+
+            var index = IndexOf(buffer, PngEndChunk);
+            return index == -1 ? -1 : index + PngEndChunk.Length;
         }
 
-        public static long SearchPngEnd(Stream stream) => SearchEndChunkLastBytePosition(stream);
-
-        public static bool IsInvalidPngEnd(long pngEnd, long streamLength) => pngEnd == -1 || pngEnd >= streamLength;
+        public static bool IsInvalidPngEnd(long pngEnd, long streamLength)
+        {
+            return pngEnd == -1 || pngEnd > streamLength;
+        }
     }
 }
