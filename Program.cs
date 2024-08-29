@@ -47,7 +47,8 @@ namespace IllCardFilter
         KoikatsuSunshine,
         RoomGirl,
         HoneyCome,
-        HoneyComeccp
+        HoneyComeccp,
+        SVC
     }
 
     public enum CardType
@@ -98,6 +99,7 @@ namespace IllCardFilter
             "【RG_Chara】" => (GameType.RoomGirl, CardType.Chara),
             "【HCChara】" => (GameType.HoneyCome, CardType.Chara),
             "【HCPChara】" => (GameType.HoneyComeccp, CardType.Chara),
+            "【SVChara】" => (GameType.SVC, CardType.Chara),
             _ => (GameType.Unknown, CardType.Unknown),
         };
 
