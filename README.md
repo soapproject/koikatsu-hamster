@@ -11,6 +11,21 @@ This program is designed to organize image files for Koikatsu and related games 
     - **Character Gender** (for Character cards only)
 4. Based on this information, the program moves the images into appropriately named folders for easy navigation.
 
+## Usage
+To use the program, simply place the executable (`.exe` file) in the directory where you normally save your character cards, and double-click it.  
+
+![image](https://github.com/user-attachments/assets/35fd39a3-29f2-4741-a4f2-3dd499da3757)
+
+## Args
+### SearchTerm
+The program accepts an optional `searchTerm` argument that can be used to filter character cards by their full name. When provided, the program will only organize files whose character name matches the search term (case-insensitive partial match).
+
+For example:
+```
+KoikatsuCardOrganizer.exe "asuna"
+```
+![image](https://github.com/user-attachments/assets/b171cfa5-eed9-47a0-85a5-f7e86d23db59)
+
 ### Folder Structure
 The files are organized into the following folder structure based on their metadata:
 - **[GameType]/**: Main directory for each game.
@@ -25,7 +40,7 @@ If a file is identified as a Koikatu character card for a female character, it w
 Koikatu/Female/[FileName].png
 ```
 
-## Usage
+## Build
 ### Prerequisites
 - .NET 8 SDK or higher
 - Visual Studio 2022 (or any other compatible IDE)
