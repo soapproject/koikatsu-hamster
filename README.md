@@ -57,3 +57,8 @@ Alternatively, you can publish it as a single executable:
 dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
 ```
 This command will generate a single executable file that you can run without additional dependencies.
+
+## Acknowledgments
+
+Many parts of the code were inspired by [KKManager](https://github.com/IllusionMods/KKManager).  
+If you like my work, please also give them a star.
