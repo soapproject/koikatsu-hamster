@@ -2,7 +2,7 @@
 This program is designed to organize image files for Koikatsu and related games into corresponding folders based on game type, character type, and character gender. It processes PNG files from a directory, extracts metadata, and moves the images into appropriate subfolders for easy categorization.
 
 ## How It Works
-1. The program scans a specified directory and its subdirectories for PNG files.
+1. The program scans current directory and its subdirectories for PNG files.
 2. It excludes directories that match game names defined in the `GameType` enum.
 3. For each found PNG file, the program extracts metadata to determine:
     - **Game Type** (e.g., Koikatu, RoomGirl)
@@ -48,9 +48,6 @@ Koikatu/Female/[FileName].png
 1. **Clone the Repository**  
 2. **Build the Project**:
    Open the project in Visual Studio and build it in **Release** mode.  
-3. **Run the Application**:
-   - From Visual Studio, set the working directory to the location where your images are stored.
-   - Run the application; it will scan the directory and organize the images based on the logic described above.
 
 Alternatively, you can publish it as a single executable:
 ```
