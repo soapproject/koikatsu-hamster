@@ -26,11 +26,12 @@ namespace KoikatsuHamster
             System.Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             var pngFiles = FindPngFiles(Directory.GetCurrentDirectory());
+            var searchTerm = args.Length > 0 ? args[0] : null;
             foreach (var file in pngFiles)
             {
                 try
                 {
-                    var path = Parser.ParseCard(file);
+                    var path = Parser.ParseCard(file, searchTerm);
                     //Console.WriteLine($"Path: {path}");
                     if (path == null)
                     {

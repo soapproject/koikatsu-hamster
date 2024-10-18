@@ -154,7 +154,7 @@ namespace koikatsu_hamster
             return parameter;
         }
 
-        public static string? ParseCard(FileInfo file)
+        public static string? ParseCard(FileInfo file, string? searchTerm)
         {
             using var stream = file.Open(FileMode.Open, FileAccess.Read);
             long pngEndPosition = SearchForPngEnd(stream);
@@ -194,6 +194,13 @@ namespace koikatsu_hamster
                 1 => "Female",
                 _ => "Unknown",
             };
+
+            // If searchTerm is provided, perform a fuzzy match with fullname
+            if (!string.IsNullOrEmpty(searchTerm) && parameter.fullname.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return Path.Combine(gameType.ToString(), gender, searchTerm);
+            }
+
             return Path.Combine(gameType.ToString(), gender);
         }
     }
