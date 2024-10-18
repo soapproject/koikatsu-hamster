@@ -1,5 +1,4 @@
-# Koikatsu Card Organizer
-
+# Koikatsu hamster
 This program is designed to organize image files for Koikatsu and related games into corresponding folders based on game type, character type, and character gender. It processes PNG files from a directory, extracts metadata, and moves the images into appropriate subfolders for easy categorization.
 
 ## How It Works
