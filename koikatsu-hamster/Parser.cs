@@ -11,7 +11,8 @@ namespace koikatsu_hamster
         SVC,
         EmotionCreators,
         AiSyoujyo,
-        RoomGirl
+        RoomGirl,
+        Aicomi
     }
 
     internal enum CardType
@@ -54,7 +55,7 @@ namespace koikatsu_hamster
     {
         private static long SearchForPngEnd(Stream stream)
         {
-            byte[] IENDChunk = { 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82 };
+            byte[] IENDChunk = [0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82];
             const int bufferSize = 4096;
             var origPos = stream.Position;
 
@@ -123,6 +124,8 @@ namespace koikatsu_hamster
                 "【HCPChara】" => (GameType.HoneyCome, CardType.Character),
                 "【SVChara】" => (GameType.SVC, CardType.Character),
                 "【SVClothes】" => (GameType.SVC, CardType.Coordinate),
+                "【ACChara】" => (GameType.Aicomi, CardType.Character),
+                "【ACClothes】" => (GameType.Aicomi, CardType.Coordinate),
                 //"【EroMakeChara】" => (GameType.EmotionCreators, CardType.Character),
                 //"【AIS_Chara】" => (GameType.AiSyoujyo, CardType.Character),
                 //"【AIS_Clothes】" => (GameType.AiSyoujyo, CardType.Coordinate),
@@ -196,7 +199,7 @@ namespace koikatsu_hamster
             };
 
             // If searchTerm is provided, perform a fuzzy match with fullname
-            if (!string.IsNullOrEmpty(searchTerm) && parameter.fullname.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+            if (!string.IsNullOrEmpty(searchTerm) && parameter.fullname.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
             {
                 return Path.Combine(gameType.ToString(), gender, searchTerm);
             }

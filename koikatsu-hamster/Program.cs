@@ -13,7 +13,7 @@ namespace KoikatsuHamster
             var di = new DirectoryInfo(directoryPath);
 
             // Create a HashSet from the GameType enum to skip game folders
-            var gameTypeNames = new HashSet<string>(Enum.GetNames(typeof(GameType)));
+            var gameTypeNames = new HashSet<string>(Enum.GetNames<GameType>());
 
             // Find all PNGs in the current directory and subdirectories while skipping game folders
             return di.EnumerateFiles("*.png", SearchOption.AllDirectories)
